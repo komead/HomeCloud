@@ -16,7 +16,7 @@ import java.util.Date;
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(nullable = false)
     private String path;
@@ -32,5 +32,5 @@ public class File {
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-    private Date dateOfCreation;
+    private Date uploadTime;
 }
