@@ -16,17 +16,24 @@ public class UserController {
 //    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/new")
-    public User create(@RequestBody User user) {
+    public String create(@RequestBody User user) {
 //        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.addUser(user);
-        return user;
+        return "created";
     }
 
     @PostMapping("/edit/{id}")
-    public User updateUser(@PathVariable(value = "id") int id, @RequestBody User user) {
+    public String updateById(@PathVariable(value = "id") int id, @RequestBody User user) {
 //        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.editUser(id, user);
-        return user;
+        userService.editUserById(id, user);
+        return "editted";
+    }
+
+    @PostMapping("/edit/{username}")
+    public String updateByUsername(@PathVariable(value = "username") String username, @RequestBody User user) {
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userService.editUserByUsername(username, user);
+        return "editted";
     }
 
     @PostMapping("/delete/{id}")

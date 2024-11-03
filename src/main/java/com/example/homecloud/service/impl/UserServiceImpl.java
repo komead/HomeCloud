@@ -42,11 +42,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editUser(int id, User user)
+    public void editUserById(int id, User user)
     {
         User oldUser = userRepository.findById(id);
         if (oldUser == null)
             throw new RuntimeException("No such user with id: " + id);
+
+        oldUser.setUsername(user.getUsername());
+        oldUser.setPassword(user.getPassword());
+        oldUser.setEmail(user.getEmail());
+
+        userRepository.save(oldUser);
+    }
+
+    @Override
+    public void editUserByUsername(String username, User user) {
+        User oldUser = userRepository.findByUsername(username).orElse(null);
+        if (oldUser == null)
+            throw new RuntimeException("No such user with username: " + username);
 
         oldUser.setUsername(user.getUsername());
         oldUser.setPassword(user.getPassword());
