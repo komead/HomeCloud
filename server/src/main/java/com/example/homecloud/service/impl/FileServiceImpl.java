@@ -4,10 +4,13 @@ import com.example.homecloud.entity.File;
 import com.example.homecloud.repository.FileRepository;
 import com.example.homecloud.service.FileService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +25,12 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public File getFile(long id) {
-        return fileRepository.findById(id);
+        File file = fileRepository.findById(id).orElse(null);
+
+        if (file == null) {
+            throw new RuntimeException("File not found in database");
+        }
+        return file;
     }
 
     @Override
@@ -63,5 +71,27 @@ public class FileServiceImpl implements FileService {
         metadata.setUploadTime(new Date());
 
         fileRepository.save(metadata);
+    }
+
+    @Override
+    public Resource loadFile(long id) {
+        File file = fileRepository.findById(id).orElse(null);
+        if (file == null) {
+            throw new RuntimeException("File not found in database");
+        }
+
+        Path filePath = Paths.get(file.getPath()).normalize();
+        Resource resource = null;
+        try {
+            resource = new UrlResource(filePath.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (resource.exists() && resource.isReadable()) {
+            return resource;
+        } else {
+            throw new RuntimeException("File not found or is not readable");
+        }
     }
 }
