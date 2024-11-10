@@ -25,11 +25,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public File getFile(long id) {
-        File file = fileRepository.findById(id).orElse(null);
-
-        if (file == null) {
-            throw new RuntimeException("File not found in database");
-        }
+        File file = fileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found in database"));
         return file;
     }
 
@@ -75,10 +71,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Resource loadFile(long id) {
-        File file = fileRepository.findById(id).orElse(null);
-        if (file == null) {
-            throw new RuntimeException("File not found in database");
-        }
+        File file = fileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found in database"));
 
         Path filePath = Paths.get(file.getPath()).normalize();
         Resource resource = null;
@@ -93,5 +86,23 @@ public class FileServiceImpl implements FileService {
         } else {
             throw new RuntimeException("File not found or is not readable");
         }
+    }
+
+    @Override
+    public void deleteFile(long id) {
+        File file = fileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found in database"));
+
+        Path filePath = Paths.get(file.getPath());
+        if (Files.exists(filePath)) {
+            try {
+                Files.delete(filePath);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            throw new RuntimeException("File not found on disk");
+        }
+
+        fileRepository.delete(file);
     }
 }

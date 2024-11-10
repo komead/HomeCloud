@@ -8,4 +8,5 @@ public interface FileService {
     File getFile(long id);
     void saveFile(MultipartFile file);
     Resource loadFile(long id);
+    void deleteFile(long id);
 }
